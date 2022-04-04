@@ -30,4 +30,4 @@
 
 ## Arquitectura
 
-![alt text](https://github.com/GraffignaBracco/TP_ML_Engineer/blob/main/Cloud_Architecture_TP_ML_Engineer.drawio.pdf)
+![alt text](https://github.com/GraffignaBracco/TP_ML_Engineer/blob/main/imagenes/Cloud_Architecture_TP_ML_Engineer.drawio.png?raw=true)
