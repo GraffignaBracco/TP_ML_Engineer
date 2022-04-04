@@ -23,4 +23,11 @@
     * graph_airport: Esta función crea un gráfico para cada aeropuerto con la cantidad de vuelos que tuvieron por día y con un punto rojo aquellos días que fueron considerados anómalos. Todos los gráficos son guardados en una carpeta por año dentro del bucket. En este repositorio hay una muestra en la carpeta "imagenes" con todos los gráficos generados por aeropuerto para los años 2017 y 2018.
 
     ![alt text](https://github.com/GraffignaBracco/TP_ML_Engineer/blob/main/imagenes/2018/ACT.png?raw=true)
+    * upload_to_database: Sube el dataframe con la información de las cantidad de vuelos, demoras promedio y si son consideradas anómalas por día y aeropuerto a una base de datos Postgres en RDS.
 
+
+5. Amazon RDS (Postgres): Este servicio se crea para guardar los datos generados por el proceso de Airflow.
+
+## Arquitectura
+
+![alt text](https://github.com/GraffignaBracco/TP_ML_Engineer/blob/main/Cloud_Architecture_TP_ML_Engineer.drawio.pdf?raw=true)
