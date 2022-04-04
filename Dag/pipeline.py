@@ -8,9 +8,10 @@ import boto3, sys
 import numpy as np 
 import json
 import pandas as pd
+import psycopg2
 
         
-def get_max_file_with_last_year():
+def get_latest_year_file():
     s3 = boto3.client("s3")
     objects=s3.list_objects(Bucket='tpmlengineer')
     files = list()
@@ -85,36 +86,42 @@ def graph_airport(airport, df_anomalies, year):
     s3.put_object(Bucket=bucket, Key= 'output/' + year + '/' + image_name, Body=img_data, 
                                  ContentType="image/png")
     plt.close(fig)
+
+def upload_to_database(df, year):
+    endpoint = 'database-1.cxhypxexghxp.us-east-2.rds.amazonaws.com'
+    db_name = 'database-1'
+    user = 'postgres'
+    password = 'postgres'
+    conn = psycopg2.connect(conn_string)
+    df['year'] = year
+    df.to_sql('flights', con=conn, if_exists='replace', index=False)    
     
 def main(year='default'):
     if year == 'default':
         year = get_last_year()
-    
+    get_latest_year_file()
     data_filename = year + '.csv'
     df = download_file(data_filename)
     df_transformed = transform_file(df)
     df_anomalies = predict_anomalies(df_transformed)
     for i in df_anomalies.origin.unique():
         graph_airport(i, df_anomalies, year)
+    upload_to_database(df_anomalies, year)
+
 
 default_args = {
     'owner': 'juan',
     'retries': 0,
 }
 
-with DAG("extract_load_vehpo",default_args=default_args, catchup=False, schedule_interval=timedelta(minutes=1), start_date=datetime(2022, 1, 18, 21, 40, 0)) as dag:
+with DAG("pipeline",default_args=default_args, catchup=False, schedule_interval=timedelta(years=1), start_date=datetime(2022, 3, 3, 00, 0, 0)) as dag:
     
 
-    extract_data =  PythonOperator(
+    pipeline =  PythonOperator(
 
-        task_id="extract_vehiclePositions",
-        python_callable=_extract_gtfs,
-        op_args=['vehiclePositions']
+        task_id="pipeline",
+        python_callable=main,
+        op_args=['default']
     )
      
-    load_vehiclePositions =  PythonOperator(
-
-        task_id="load_vehiclePositions",
-        python_callable=_load_gtfs,
-    )
-    extract_vehiclePositions >> load_vehiclePositions
+    pipeline
